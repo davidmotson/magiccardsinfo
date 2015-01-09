@@ -17,7 +17,7 @@ public class RarityCondition implements Condition {
 		if(rarities.isEmpty()){
 			return "";
 		}
-		return "( " + rarities.stream().map(x -> "r:" + x).reduce("", (x,y) -> x + " OR " + y) + " )";
+		return "( " + rarities.stream().map(x -> "r:" + x).reduce((x,y) -> x + " OR " + y).get() + " )";
 	}
 
 }

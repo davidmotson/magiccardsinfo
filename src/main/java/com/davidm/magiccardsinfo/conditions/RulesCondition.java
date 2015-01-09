@@ -9,7 +9,7 @@ public class RulesCondition implements Condition {
 	}
 	
 	public String toString(){
-		return " \"" + rule + "\" ";
+		return "o:\"" + rule + "\" ";
 	}
 
 }

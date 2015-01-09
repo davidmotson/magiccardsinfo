@@ -1,7 +1,6 @@
 package com.davidm.magiccardsinfo.enums;
 
 public enum Rarity {
-	// (r:mythic or r:rare or r:uncommon or r:land or r:common or r:special)
 	
 	MYTHIC, RARE, UNCOMMON, LAND, COMMON, SPECIAL;
 	

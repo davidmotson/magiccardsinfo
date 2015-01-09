@@ -13,10 +13,11 @@ public class OrCondition implements Condition{
 	}
 	
 	public String toString(){
-		if(conditions.isEmpty() || conditions.stream().allMatch(x -> x.toString().isEmpty())){
-			return "";
+		String output = conditions.stream().map(Condition::toString).filter(x -> !x.isEmpty()).reduce((x,y) -> x + " OR " + y).orElse("");
+		if(output.isEmpty()){
+			return output;
 		}
-		return "( " + conditions.stream().map(Condition::toString).filter(x -> !x.isEmpty()).reduce("", (x,y) -> x + " OR " + y) + " )";
+		return "( " + output + " )";
 	}
 
 }
