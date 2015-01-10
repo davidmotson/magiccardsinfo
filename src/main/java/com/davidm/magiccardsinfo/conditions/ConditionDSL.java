@@ -2,7 +2,6 @@ package com.davidm.magiccardsinfo.conditions;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -10,7 +9,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.davidm.magiccardsinfo.AsyncCardService;
 import com.davidm.magiccardsinfo.SearchResult;
 import com.davidm.magiccardsinfo.enums.Color;
 import com.davidm.magiccardsinfo.enums.Rarity;
@@ -116,11 +114,22 @@ public class ConditionDSL {
 	}
 
 	public static List<SearchResult> search(Condition condition) {
-		return AsyncCardService.search(condition);
-	}
-	
-	public static Future<List<SearchResult>> searchAsync(Condition condition){
-		return AsyncCardService.searchAsync(condition);
+		try {
+			Document resultPage = Jsoup.connect(
+					"http://magiccards.info/query?q=" + condition
+							+ "&v=olist&s=cname").get();
+			return Stream
+					.concat(resultPage.getElementsByClass("even").stream(),
+							resultPage.getElementsByClass("odd").stream())
+					.map(row -> {
+						Element result = row.getElementsByTag("a").get(0);
+						return new SearchResult(result.text(),
+								"http://magiccards.info" + result.attr("href"));
+					}).collect(Collectors.toList());
+		} catch (IOException e) {
+			throw new RuntimeException("Lost connection when fetching results",
+					e);
+		}
 	}
 
 }
