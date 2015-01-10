@@ -66,7 +66,7 @@ public class ConditionDSL {
 		return new GreaterThanOrEqual(num);
 	}
 	
-	public static RelationalOperator gteq(int num){
+	public static RelationalOperator ge(int num){
 		return new GreaterThanOrEqual(num);
 	}
 	
@@ -82,7 +82,7 @@ public class ConditionDSL {
 		return new LessThanOrEqual(num);
 	}
 	
-	public static RelationalOperator lteq(int num){
+	public static RelationalOperator le(int num){
 		return new LessThanOrEqual(num);
 	}
 	
