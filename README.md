@@ -12,8 +12,8 @@ The goal is to be able to query with java code like this
 
 currently results in the following list 
 
-Damia, Sage of Stone
-The Mimeoplasm
-Sidisi, Brood Tyrant
-Vorosh, the Hunter
+Damia, Sage of Stone  
+The Mimeoplasm  
+Sidisi, Brood Tyrant  
+Vorosh, the Hunter  
 
