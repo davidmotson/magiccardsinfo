@@ -1,7 +1,6 @@
 package com.davidm.magiccardsinfo.conditions;
 
 public interface Condition {
-	public String toString();
 	
 	default Condition or(Condition... conditions){
 		Condition[] tempConditions = new Condition[conditions.length + 1];

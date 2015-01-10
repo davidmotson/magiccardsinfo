@@ -5,6 +5,12 @@ import java.util.stream.Stream;
 import com.davidm.magiccardsinfo.enums.Color;
 import com.davidm.magiccardsinfo.enums.Rarity;
 import com.davidm.magiccardsinfo.enums.Type;
+import com.davidm.magiccardsinfo.relationaloperators.Equal;
+import com.davidm.magiccardsinfo.relationaloperators.GreaterThan;
+import com.davidm.magiccardsinfo.relationaloperators.GreaterThanOrEqual;
+import com.davidm.magiccardsinfo.relationaloperators.LessThan;
+import com.davidm.magiccardsinfo.relationaloperators.LessThanOrEqual;
+import com.davidm.magiccardsinfo.relationaloperators.RelationalOperator;
 
 public class ConditionDSL {
 	
@@ -38,6 +44,62 @@ public class ConditionDSL {
 	
 	public static Condition type(Type... types){
 		return and((Condition[]) Stream.of(types).map(TypeCondition::new).toArray(x -> new Condition[x]));
+	}
+	
+	public static RelationalOperator equal(int num){
+		return new Equal(num);
+	}
+	
+	public static RelationalOperator eq(int num){
+		return new Equal(num);
+	}
+	
+	public static RelationalOperator greaterThan(int num){
+		return new GreaterThan(num);
+	}
+	
+	public static RelationalOperator gt(int num){
+		return new GreaterThan(num);
+	}
+	
+	public static RelationalOperator greaterThanOrEqualTo(int num){
+		return new GreaterThanOrEqual(num);
+	}
+	
+	public static RelationalOperator gteq(int num){
+		return new GreaterThanOrEqual(num);
+	}
+	
+	public static RelationalOperator lessThan(int num){
+		return new LessThan(num);
+	}
+	
+	public static RelationalOperator lt(int num){
+		return new LessThan(num);
+	}
+	
+	public static RelationalOperator lessThanOrEqualTo(int num){
+		return new LessThanOrEqual(num);
+	}
+	
+	public static RelationalOperator lteq(int num){
+		return new LessThanOrEqual(num);
+	}
+	
+	public static Condition power(RelationalOperator op){
+		return new PowerCondition(op);
+	}
+	
+	public static Condition toughness(RelationalOperator op){
+		return new ToughnessCondition(op);
+	}
+	
+	public static Condition cmc(RelationalOperator op){
+		return new CMCCondition(op);
+	}
+	
+	public static Condition convertedManaCost(RelationalOperator op){
+		return new CMCCondition(op);
 	}
 
 }
