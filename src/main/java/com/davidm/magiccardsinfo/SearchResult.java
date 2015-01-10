@@ -12,5 +12,9 @@ public class SearchResult {
 	public String getCardName(){
 		return cardName;
 	}
+	
+	public String getCardUrl(){
+		return cardUrl;
+	}
 
 }
