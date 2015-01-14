@@ -1,25 +1,15 @@
 package com.davidm.magiccardsinfo.enums;
 
 public enum Color {
-	WHITE, BLUE, BLACK, RED, GREEN, MULTICOLOR, COLORLESS;
+	WHITE('W'), BLUE('U'), BLACK('B'), RED('R'), GREEN('G'), MULTICOLOR('M'), COLORLESS('C');
+	
+	private char colorChar;
+	
+	Color(char colorChar){
+		this.colorChar = colorChar;
+	}
 
 	public String toChar() {
-		switch (this) {
-		case WHITE:
-			return "W";
-		case BLUE:
-			return "U";
-		case BLACK:
-			return "B";
-		case RED:
-			return "R";
-		case GREEN:
-			return "G";
-		case COLORLESS:
-			return "C";
-		case MULTICOLOR:
-			return "M";
-		}
-		throw new RuntimeException("Unknown Color");
+		return String.valueOf(colorChar);
 	}
 }

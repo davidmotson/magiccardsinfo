@@ -1,16 +1,12 @@
 package com.davidm.magiccardsinfo.conditions;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
+import com.davidm.magiccardsinfo.MagicFetcher;
 import com.davidm.magiccardsinfo.SearchResult;
 import com.davidm.magiccardsinfo.enums.Color;
+import com.davidm.magiccardsinfo.enums.Format;
 import com.davidm.magiccardsinfo.enums.Rarity;
 import com.davidm.magiccardsinfo.enums.Type;
 import com.davidm.magiccardsinfo.relationaloperators.Equal;
@@ -19,6 +15,8 @@ import com.davidm.magiccardsinfo.relationaloperators.GreaterThanOrEqual;
 import com.davidm.magiccardsinfo.relationaloperators.LessThan;
 import com.davidm.magiccardsinfo.relationaloperators.LessThanOrEqual;
 import com.davidm.magiccardsinfo.relationaloperators.RelationalOperator;
+
+
 
 public class ConditionDSL {
 
@@ -114,22 +112,19 @@ public class ConditionDSL {
 	}
 
 	public static List<SearchResult> search(Condition condition) {
-		try {
-			Document resultPage = Jsoup.connect(
-					"http://magiccards.info/query?q=" + condition
-							+ "&v=olist&s=cname").get();
-			return Stream
-					.concat(resultPage.getElementsByClass("even").stream(),
-							resultPage.getElementsByClass("odd").stream())
-					.map(row -> {
-						Element result = row.getElementsByTag("a").get(0);
-						return new SearchResult(result.text(),
-								"http://magiccards.info" + result.attr("href"));
-					}).collect(Collectors.toList());
-		} catch (IOException e) {
-			throw new RuntimeException("Lost connection when fetching results",
-					e);
-		}
+		return MagicFetcher.search(condition);
+	}
+	
+	public static Condition colorId(Color...colors){
+		return new ColorIdCondition(colors);
+	}
+	
+	public static Condition legalIn(Format format){
+		return new LegalityCondition(format);
+	}
+	
+	public static Condition set(String setName){
+		return new SetCondition(setName);
 	}
 
 }
