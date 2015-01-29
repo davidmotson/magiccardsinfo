@@ -14,7 +14,7 @@ public enum Type {
 	LEGENDARY("legendary"), 
 	AURA("aura"), 
 	SHRINE("shrine"), 
-	WORLD_ENCHANTMENT("\"world enchantment\""), 
+	WORLD("world"), 
 	SNOW("snow"), 
 	ARCANE("arcane"), 
 	TRIBAL("tribal"),
