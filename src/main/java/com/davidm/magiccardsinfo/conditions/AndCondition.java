@@ -12,11 +12,9 @@ public class AndCondition implements Condition{
 	}
 	
 	public String toString(){
-		String output = conditions.stream().map(Condition::toString).filter(x -> !x.isEmpty()).reduce((x,y) -> x + " AND " + y).orElse("");
-		if(output.isEmpty()){
-			return output;
-		}
-		return "( " + output + " )";
+		return conditions.stream().map(Condition::toString)
+				.filter(x -> !x.isEmpty()).reduce((x, y) -> x + " AND " + y)
+				.map(x -> "( " + x + " )").orElse("");
 	}
 
 }

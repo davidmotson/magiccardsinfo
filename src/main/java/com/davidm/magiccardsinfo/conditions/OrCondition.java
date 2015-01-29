@@ -13,11 +13,9 @@ public class OrCondition implements Condition{
 	}
 	
 	public String toString(){
-		String output = conditions.stream().map(Condition::toString).filter(x -> !x.isEmpty()).reduce((x,y) -> x + " OR " + y).orElse("");
-		if(output.isEmpty()){
-			return output;
-		}
-		return "( " + output + " )";
+		return conditions.stream().map(Condition::toString)
+				.filter(x -> !x.isEmpty()).reduce((x, y) -> x + " OR " + y)
+				.map(x -> "( " + x + " )").orElse("");
 	}
 
 }
