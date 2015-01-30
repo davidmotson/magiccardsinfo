@@ -68,8 +68,8 @@ public class MagicFetcher {
 		private Document doc;
 		private String name;
 		private List<String> manaCost;
-		private Set<Color> color;
-		private Set<Type> type;
+		private Set<Color> colors;
+		private Set<Type> types;
 		private Rarity rarity;
 		private String text;
 		private String flavorText;
@@ -80,27 +80,31 @@ public class MagicFetcher {
 		
 		public static void main(String... args) throws IOException{
 			MagicCardBuilder temp = new MagicCardBuilder(Jsoup.connect(
-					"http://magiccards.info/fvd/en/10.html").get());
+					"http://magiccards.info/shm/en/224.html").get());
 			temp.extractName();
-			System.out.println(temp.name);
+			temp.extractCost();
+			temp.extractColors();
+			temp.extractTypes();
+			temp.extractRarity();
+			System.out.println(temp.colors);
 		}
 		
 		public MagicCardBuilder(Document doc){
 			this.doc = doc;
 		}
 		
-		private MagicCardBuilder extractName() {
+		private void extractName() {
 			name = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > span > a")
 					.get(0).text();
-			return this;
+			return;
 		}
 		
-		private MagicCardBuilder extractCost(){
+		private void extractCost(){
 			String textBox = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p:nth-child(2)").get(0).text();
 			Matcher matcher = costTypePattern.matcher(textBox);
 			if(!matcher.matches()){
 				manaCost = Collections.emptyList();
-				return this;
+				return;
 			}
 			String cost = matcher.group(3);
 			Matcher costMatcher = manaCostPattern.matcher(cost);
@@ -108,7 +112,29 @@ public class MagicFetcher {
 			while(costMatcher.find()){
 				manaCost.add(costMatcher.group());
 			}
-			return this;
+			return;
+		}
+		
+		private void extractColors(){
+			colors = manaCost.stream().map(Color::parseColor).flatMap(Set::stream).filter(x -> x != null).collect(Collectors.toSet());
+			if(colors.isEmpty()){
+		}
+		
+		private void extractTypes(){
+			String textBox = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p:nth-child(2)").get(0).text();
+			Matcher matcher = costTypePattern.matcher(textBox);
+			if(!matcher.matches()){
+				types = Collections.emptySet();
+				return;
+			}
+			types = Stream.of(matcher.group(1).split("\\s")).map(Type::parseType).filter(x -> x != null).collect(Collectors.toSet());
+		}
+		
+		private void extractRarity(){
+			String text = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(3) small > b").get(1).text();
+			String[] split = text.split("\\(");
+			String rarity = split[split.length-1];
+			this.rarity = Rarity.parseRarity(rarity);
 		}
 		
 		

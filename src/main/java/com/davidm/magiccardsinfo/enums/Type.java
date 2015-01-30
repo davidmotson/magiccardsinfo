@@ -1,23 +1,23 @@
 package com.davidm.magiccardsinfo.enums;
 
 public enum Type {
-	ARTIFACT("artifact"),
-	CREATURE("creature"),
-	ENCHANTMENT("enchantment"),
-	LAND("land"), 
-	INSTANT("instant"), 
-	SORCERY("sorcery"), 
-	PLANESWALKER("planeswalker"), 
-	EQUIPMENT("equipment"), 
-	FORTIFICATION("fortification"), 
-	BASIC_LAND("basic"), 
-	LEGENDARY("legendary"), 
-	AURA("aura"), 
-	SHRINE("shrine"), 
-	WORLD("world"), 
-	SNOW("snow"), 
-	ARCANE("arcane"), 
-	TRIBAL("tribal"),
+	ARTIFACT("Artifact"),
+	CREATURE("Creature"),
+	ENCHANTMENT("Enchantment"),
+	LAND("Land"), 
+	INSTANT("Instant"), 
+	SORCERY("Sorcery"), 
+	PLANESWALKER("Planeswalker"), 
+	EQUIPMENT("Equipment"), 
+	FORTIFICATION("Fortification"), 
+	BASIC_LAND("Basic"), 
+	LEGENDARY("Legendary"), 
+	AURA("Aura"), 
+	SHRINE("Shrine"), 
+	WORLD("World"), 
+	SNOW("Snow"), 
+	ARCANE("Arcane"), 
+	TRIBAL("Tribal"),
 	ADVISOR("Advisor"),
 	ALLY("Ally"),
 	ANGEL("Angel"),
@@ -257,5 +257,14 @@ public enum Type {
 	@Override
 	public String toString(){
 		return name;
+	}
+	
+	public static Type parseType(String in){
+		for(Type t : values()){
+			if(t.toString().equalsIgnoreCase(in)){
+				return t;
+			}
+		}
+		return null;
 	}
 }
