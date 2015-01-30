@@ -19,6 +19,7 @@ public class MagicCard {
 	private Optional<Integer> power;
 	private Optional<Integer> toughness;
 	private String imageUrl;
+	private String priceUrl;
 	private int lowPriceCents;
 	private int midPriceCents;
 	private int highPriceCents;

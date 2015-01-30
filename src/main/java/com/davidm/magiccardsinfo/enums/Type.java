@@ -10,7 +10,7 @@ public enum Type {
 	PLANESWALKER("planeswalker"), 
 	EQUIPMENT("equipment"), 
 	FORTIFICATION("fortification"), 
-	BASIC_LAND("\"basic land\""), 
+	BASIC_LAND("basic"), 
 	LEGENDARY("legendary"), 
 	AURA("aura"), 
 	SHRINE("shrine"), 
@@ -254,6 +254,7 @@ public enum Type {
 		this.name = name;
 	}
 	
+	@Override
 	public String toString(){
 		return name;
 	}
