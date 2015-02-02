@@ -3,6 +3,7 @@ package com.davidm.magiccardsinfo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -73,20 +74,24 @@ public class MagicFetcher {
 		private Rarity rarity;
 		private String text;
 		private String flavorText;
-		private Optional<Integer> power;
-		private Optional<Integer> toughness;
+		private Integer power;
+		private Integer toughness;
 		private String imageUrl;
 		private String priceUrl;
 		
 		public static void main(String... args) throws IOException{
 			MagicCardBuilder temp = new MagicCardBuilder(Jsoup.connect(
-					"http://magiccards.info/shm/en/224.html").get());
+					"http://magiccards.info/ne/en/103.html").get());
 			temp.extractName();
 			temp.extractCost();
 			temp.extractColors();
 			temp.extractTypes();
 			temp.extractRarity();
-			System.out.println(temp.colors);
+			temp.extractText();
+			temp.extractFlavorText();
+			temp.extractPowerAndToughness();
+			temp.extractImageUrl();
+			System.out.println(temp.imageUrl);
 		}
 		
 		public MagicCardBuilder(Document doc){
@@ -96,7 +101,6 @@ public class MagicFetcher {
 		private void extractName() {
 			name = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > span > a")
 					.get(0).text();
-			return;
 		}
 		
 		private void extractCost(){
@@ -112,12 +116,15 @@ public class MagicFetcher {
 			while(costMatcher.find()){
 				manaCost.add(costMatcher.group());
 			}
-			return;
 		}
 		
 		private void extractColors(){
-			colors = manaCost.stream().map(Color::parseColor).flatMap(Set::stream).filter(x -> x != null).collect(Collectors.toSet());
+			colors = manaCost.stream().map(Color::parseColor)
+					.flatMap(Set::stream).filter(x -> x != null)
+					.collect(Collectors.toSet());
 			if(colors.isEmpty()){
+				colors = EnumSet.of(Color.COLORLESS);
+			}
 		}
 		
 		private void extractTypes(){
@@ -127,7 +134,9 @@ public class MagicFetcher {
 				types = Collections.emptySet();
 				return;
 			}
-			types = Stream.of(matcher.group(1).split("\\s")).map(Type::parseType).filter(x -> x != null).collect(Collectors.toSet());
+			types = Stream.of(matcher.group(1).split("\\s"))
+					.map(Type::parseType).filter(x -> x != null)
+					.collect(Collectors.toSet());
 		}
 		
 		private void extractRarity(){
@@ -135,6 +144,51 @@ public class MagicFetcher {
 			String[] split = text.split("\\(");
 			String rarity = split[split.length-1];
 			this.rarity = Rarity.parseRarity(rarity);
+		}
+		
+		private void extractText(){
+			text = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p.ctext > b")
+					.get(0).html().replace("<br>", "\n");
+		}
+		
+		private void extractFlavorText(){
+			flavorText = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p:nth-child(4) > i")
+					.get(0).html().replace("<br>", "\n");
+		}
+		
+		private void extractPowerAndToughness(){
+			String textBox = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p:nth-child(2)").get(0).text();
+			Matcher matcher = costTypePattern.matcher(textBox);
+			if(!matcher.matches()){
+				power = null;
+				toughness = null;
+				return;
+			}
+			String[] typeAndPower = matcher.group(1).split(" ");
+			String[] powerToughness = typeAndPower[typeAndPower.length - 1].split("/");
+			if(powerToughness.length < 2){
+				power = null;
+				toughness = null;
+				return;
+			}
+			try{
+				power = Integer.parseInt(powerToughness[0]);
+			}catch(NumberFormatException e){
+				power = null;
+			}
+			try{
+				toughness = Integer.parseInt(powerToughness[1]);
+			}catch(NumberFormatException e){
+				toughness = null;
+			}
+		}
+		
+		private void extractImageUrl(){
+			imageUrl = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(1) > img").get(0).attr("src");
+		}
+		
+		private void extractPriceUrl(){
+			
 		}
 		
 		
