@@ -66,6 +66,7 @@ public class MagicFetcher {
 	private static class MagicCardBuilder{
 		private static Pattern costTypePattern = Pattern.compile("\\s*([^,]*)(,\\s+(\\S+)(\\s+\\((.*)\\))?+)?+\\s*");
 		private static Pattern manaCostPattern = Pattern.compile("W|U|B|R|G|(\\d+)|(\\{.*?\\})");
+		private static Pattern pricePattern = Pattern.compile(".*L:\\s*<.*>(\\$[\\d[\\.]]+|NA)<.*M:\\s*<.*>(\\$[\\d[\\.]]+|NA)<.*H:\\s*<.*>(\\$[\\d[\\.]]+|NA)<.*");
 		private Document doc;
 		private String name;
 		private List<String> manaCost;
@@ -78,10 +79,11 @@ public class MagicFetcher {
 		private Integer toughness;
 		private String imageUrl;
 		private String priceUrl;
+		private Price price;
 		
 		public static void main(String... args) throws IOException{
 			MagicCardBuilder temp = new MagicCardBuilder(Jsoup.connect(
-					"http://magiccards.info/ne/en/103.html").get());
+					"http://magiccards.info/frf/en/1.html").get());
 			temp.extractName();
 			temp.extractCost();
 			temp.extractColors();
@@ -91,7 +93,9 @@ public class MagicFetcher {
 			temp.extractFlavorText();
 			temp.extractPowerAndToughness();
 			temp.extractImageUrl();
-			System.out.println(temp.imageUrl);
+			temp.extractPriceUrl();
+			temp.extractPrices();
+			System.out.println(temp.price);
 		}
 		
 		public MagicCardBuilder(Document doc){
@@ -104,7 +108,7 @@ public class MagicFetcher {
 		}
 		
 		private void extractCost(){
-			String textBox = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p:nth-child(2)").get(0).text();
+			String textBox = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p:nth-child(2)").first().text();
 			Matcher matcher = costTypePattern.matcher(textBox);
 			if(!matcher.matches()){
 				manaCost = Collections.emptyList();
@@ -128,7 +132,7 @@ public class MagicFetcher {
 		}
 		
 		private void extractTypes(){
-			String textBox = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p:nth-child(2)").get(0).text();
+			String textBox = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p:nth-child(2)").first().text();
 			Matcher matcher = costTypePattern.matcher(textBox);
 			if(!matcher.matches()){
 				types = Collections.emptySet();
@@ -148,16 +152,16 @@ public class MagicFetcher {
 		
 		private void extractText(){
 			text = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p.ctext > b")
-					.get(0).html().replace("<br>", "\n");
+					.first().html().replace("<br>", "\n");
 		}
 		
 		private void extractFlavorText(){
 			flavorText = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p:nth-child(4) > i")
-					.get(0).html().replace("<br>", "\n");
+					.first().html().replace("<br>", "\n");
 		}
 		
 		private void extractPowerAndToughness(){
-			String textBox = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p:nth-child(2)").get(0).text();
+			String textBox = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(2) > p:nth-child(2)").first().text();
 			Matcher matcher = costTypePattern.matcher(textBox);
 			if(!matcher.matches()){
 				power = null;
@@ -184,11 +188,50 @@ public class MagicFetcher {
 		}
 		
 		private void extractImageUrl(){
-			imageUrl = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(1) > img").get(0).attr("src");
+			imageUrl = doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(1) > img").first().attr("src");
 		}
 		
 		private void extractPriceUrl(){
-			
+			priceUrl = Optional.ofNullable(
+							doc.select("body > table:nth-child(7) > tbody > tr > td:nth-child(1) > script")
+									.first()).map(x -> x.attr("src"))
+					.orElse(null);
+		}
+		
+		private void extractPrices(){
+			if(priceUrl == null){
+				price = null;
+				return;
+			}
+			try{
+				String priceString = Jsoup.connect(priceUrl).ignoreContentType(true).execute().body();
+				Matcher priceMatcher = pricePattern.matcher(priceString);
+				if(!priceMatcher.matches()){
+					price = null;
+					return;
+				}
+				Integer lowPrice;
+				Integer midPrice;
+				Integer highPrice;
+				if(priceMatcher.group(1).equals("NA")){
+					lowPrice = null;
+				}else{
+					lowPrice = Integer.parseInt(priceMatcher.group(1).replaceAll("\\$|\\.", ""));
+				}
+				if(priceMatcher.group(2).equals("NA")){
+					midPrice = null;
+				}else{
+					midPrice = Integer.parseInt(priceMatcher.group(2).replaceAll("\\$|\\.", ""));
+				}
+				if(priceMatcher.group(3).equals("NA")){
+					highPrice = null;
+				}else{
+					highPrice = Integer.parseInt(priceMatcher.group(3).replaceAll("\\$|\\.", ""));
+				}
+				price = new Price(lowPrice,midPrice, highPrice);
+			}catch(IOException e){
+				price = null;
+			}
 		}
 		
 		
