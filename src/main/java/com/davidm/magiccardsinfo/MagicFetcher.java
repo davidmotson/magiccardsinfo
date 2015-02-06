@@ -63,7 +63,7 @@ public class MagicFetcher {
 
 	
 	
-	private static class MagicCardBuilder{
+	static class MagicCardBuilder{
 		private static Pattern costTypePattern = Pattern.compile("\\s*([^,]*)(,\\s+(\\S+)(\\s+\\((.*)\\))?+)?+\\s*");
 		private static Pattern manaCostPattern = Pattern.compile("W|U|B|R|G|(\\d+)|(\\{.*?\\})");
 		private static Pattern pricePattern = Pattern.compile(".*L:\\s*<.*>(\\$[\\d[\\.]]+|NA)<.*M:\\s*<.*>(\\$[\\d[\\.]]+|NA)<.*H:\\s*<.*>(\\$[\\d[\\.]]+|NA)<.*");
@@ -81,24 +81,30 @@ public class MagicFetcher {
 		private String priceUrl;
 		private Price price;
 		
-		public static void main(String... args) throws IOException{
-			MagicCardBuilder temp = new MagicCardBuilder(Jsoup.connect(
-					"http://magiccards.info/frf/en/1.html").get());
-			temp.extractName();
-			temp.extractCost();
-			temp.extractColors();
-			temp.extractTypes();
-			temp.extractRarity();
-			temp.extractText();
-			temp.extractFlavorText();
-			temp.extractPowerAndToughness();
-			temp.extractImageUrl();
-			temp.extractPriceUrl();
-			temp.extractPrices();
-			System.out.println(temp.price);
+		public static MagicCard build(String url, boolean getPrice) throws IOException{
+			MagicCardBuilder builder = new MagicCardBuilder(Jsoup.connect(url).get());
+			builder.extractName();
+			builder.extractCost();
+			builder.extractColors();
+			builder.extractTypes();
+			builder.extractRarity();
+			builder.extractRarity();
+			builder.extractText();
+			builder.extractFlavorText();
+			builder.extractPowerAndToughness();
+			builder.extractImageUrl();
+			builder.extractPriceUrl();
+			if(getPrice){
+				builder.extractPrices();
+			}
+			return new MagicCard(builder.name, builder.manaCost,
+					builder.colors, builder.types, builder.rarity,
+					builder.text, builder.flavorText, builder.power,
+					builder.toughness, builder.imageUrl, builder.price);
 		}
 		
-		public MagicCardBuilder(Document doc){
+		
+		private MagicCardBuilder(Document doc){
 			this.doc = doc;
 		}
 		
@@ -115,6 +121,10 @@ public class MagicFetcher {
 				return;
 			}
 			String cost = matcher.group(3);
+			if(cost == null){
+				manaCost = Collections.emptyList();
+				return;
+			}
 			Matcher costMatcher = manaCostPattern.matcher(cost);
 			manaCost = new ArrayList<String>();
 			while(costMatcher.find()){
@@ -228,7 +238,7 @@ public class MagicFetcher {
 				}else{
 					highPrice = Integer.parseInt(priceMatcher.group(3).replaceAll("\\$|\\.", ""));
 				}
-				price = new Price(lowPrice,midPrice, highPrice);
+				price = new Price(lowPrice, midPrice, highPrice);
 			}catch(IOException e){
 				price = null;
 			}
