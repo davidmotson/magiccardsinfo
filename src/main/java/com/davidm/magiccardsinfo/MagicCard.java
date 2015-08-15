@@ -77,8 +77,8 @@ public class MagicCard {
 		return imageUrl;
 	}
 	
-	public Optional<Price> getPrice(){
-		return Optional.ofNullable(price);
+	public Price getPrice(){
+		return price;
 	}
 
 	@Override

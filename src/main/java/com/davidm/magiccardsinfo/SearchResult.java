@@ -19,12 +19,21 @@ public class SearchResult {
 		return cardUrl;
 	}
 	
-	public MagicCard getCard() throws IOException{
-		return MagicFetcher.MagicCardBuilder.build(cardUrl, false);
+	public MagicCard getCard(){
+		try {
+			return MagicFetcher.MagicCardBuilder.build(cardUrl, false);
+		} catch (IOException e) {
+			throw new RuntimeException("Error while fetching: " + cardName, e);
+
+		}
 	}
 	
-	public MagicCard getCardWithPrice() throws IOException{
-		return MagicFetcher.MagicCardBuilder.build(cardUrl, true);
+	public MagicCard getCardWithPrice(){
+		try {
+			return MagicFetcher.MagicCardBuilder.build(cardUrl, true);
+		} catch (IOException e) {
+			throw new RuntimeException("Error while fetching: " + cardName, e);
+		}
 	}
 
 }

@@ -210,14 +210,14 @@ public class MagicFetcher {
 		
 		private void extractPrices(){
 			if(priceUrl == null){
-				price = null;
+				price = new Price(null, null, null);
 				return;
 			}
 			try{
 				String priceString = Jsoup.connect(priceUrl).ignoreContentType(true).execute().body();
 				Matcher priceMatcher = pricePattern.matcher(priceString);
 				if(!priceMatcher.matches()){
-					price = null;
+					price = new Price(null, null, null);
 					return;
 				}
 				Integer lowPrice;
@@ -240,7 +240,7 @@ public class MagicFetcher {
 				}
 				price = new Price(lowPrice, midPrice, highPrice);
 			}catch(IOException e){
-				price = null;
+				price = new Price(null, null, null);
 			}
 		}
 		
